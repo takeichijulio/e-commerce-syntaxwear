@@ -1,0 +1,1195 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f4ef">
+  <meta name="description" content="Checklist editável para acompanhar a construção da homepage do e-commerce de calçados.">
+  <title>Checklist de desenvolvimento — Homepage</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3f4ef;
+      --surface: #fffefa;
+      --ink: #202823;
+      --muted: #65716a;
+      --line: #d9ded8;
+      --accent: #175a45;
+      --accent-soft: #e7f0eb;
+      --danger: #a34432;
+      --focus: #b4532e;
+      --content-width: 1180px;
+      --radius: 12px;
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 1.5rem;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button,
+    a,
+    input {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    [contenteditable="true"]:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 10;
+      top: 0.75rem;
+      left: 0.75rem;
+      transform: translateY(-160%);
+      padding: 0.65rem 0.85rem;
+      border-radius: 6px;
+      background: var(--ink);
+      color: white;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .page-shell {
+      width: min(calc(100% - 2.5rem), var(--content-width));
+      margin-inline: auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 4.5rem;
+      border-bottom: 1px solid var(--line);
+      gap: 1rem;
+    }
+
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      color: var(--ink);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+    }
+
+    .wordmark-mark {
+      display: grid;
+      width: 1.85rem;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      font-size: 0.75rem;
+      letter-spacing: -0.04em;
+    }
+
+    .save-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    .save-status::before {
+      width: 0.48rem;
+      height: 0.48rem;
+      border-radius: 50%;
+      background: var(--accent);
+      content: "";
+    }
+
+    .save-status[data-state="error"] {
+      color: var(--danger);
+    }
+
+    .save-status[data-state="error"]::before {
+      background: var(--danger);
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 310px);
+      align-items: end;
+      gap: clamp(2rem, 6vw, 5.5rem);
+      padding-block: clamp(3.25rem, 7vw, 6rem) 3rem;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 12ch;
+      margin-bottom: 1rem;
+      font-size: clamp(2.7rem, 6vw, 5.1rem);
+      font-weight: 650;
+      letter-spacing: -0.035em;
+      line-height: 0.99;
+    }
+
+    .intro-copy {
+      max-width: 58ch;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .progress-panel {
+      padding: 1.15rem 1.25rem 1.25rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .progress-panel-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .progress-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 650;
+    }
+
+    .progress-value {
+      color: var(--accent);
+      font-size: 1.45rem;
+      font-weight: 750;
+      letter-spacing: -0.035em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    progress {
+      display: block;
+      width: 100%;
+      height: 0.55rem;
+      overflow: hidden;
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      background: #e4e8e3;
+    }
+
+    progress::-webkit-progress-bar {
+      border-radius: 999px;
+      background: #e4e8e3;
+    }
+
+    progress::-webkit-progress-value {
+      border-radius: 999px;
+      background: var(--accent);
+      transition: width 180ms ease-out;
+    }
+
+    progress::-moz-progress-bar {
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .progress-count {
+      margin: 0.65rem 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .toolbar-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.55rem;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 2.6rem;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.55rem 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 680;
+      line-height: 1.15;
+      transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+
+    .button:hover {
+      border-color: #9aa99f;
+      background: #f7faf6;
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button-primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    .button-primary:hover {
+      border-color: #104735;
+      background: #104735;
+    }
+
+    .button-small {
+      min-height: 2.1rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.76rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(2rem, 5vw, 4.5rem);
+      padding-block: 2.25rem 6rem;
+    }
+
+    .stage-nav {
+      position: sticky;
+      top: 1.5rem;
+      padding-block: 0.35rem;
+    }
+
+    .stage-nav-title {
+      margin: 0 0 0.85rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-weight: 750;
+    }
+
+    .stage-nav-list {
+      display: grid;
+      gap: 0.2rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .stage-nav a {
+      display: grid;
+      grid-template-columns: 2rem minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.4rem;
+      padding: 0.55rem 0.5rem;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.3;
+      text-decoration: none;
+    }
+
+    .stage-nav a:hover {
+      background: var(--accent-soft);
+      color: var(--ink);
+    }
+
+    .nav-number {
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+      font-weight: 750;
+    }
+
+    .stages {
+      min-width: 0;
+    }
+
+    .stage {
+      padding-block: 0.5rem 2.15rem;
+      scroll-margin-top: 1.5rem;
+    }
+
+    .stage + .stage {
+      padding-top: 2rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .stage-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1.25rem;
+      margin-bottom: 1.05rem;
+    }
+
+    .stage h2 {
+      margin-bottom: 0;
+      font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+      font-weight: 680;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+
+    .stage-count {
+      flex: 0 0 auto;
+      padding: 0.5rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .task-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .task-item {
+      display: grid;
+      grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 0.8rem;
+      padding: 0.76rem 0.1rem;
+      border-bottom: 1px solid #e3e6e1;
+    }
+
+    .task-checkbox {
+      width: 1.1rem;
+      height: 1.1rem;
+      margin: 0.15rem 0 0;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .task-label {
+      min-width: 0;
+      cursor: pointer;
+      font-size: 0.93rem;
+      line-height: 1.45;
+    }
+
+    .task-copy {
+      display: inline-block;
+      min-width: 1ch;
+      border-radius: 3px;
+    }
+
+    .task-item.is-complete .task-copy {
+      color: #69756e;
+      text-decoration: line-through;
+      text-decoration-color: #9baa9f;
+      text-decoration-thickness: 1px;
+    }
+
+    .task-copy[contenteditable="true"] {
+      padding: 0.5rem 0.6rem;
+      background: #f0f4ef;
+      color: var(--ink);
+      cursor: text;
+      text-decoration: none;
+    }
+
+    .remove-task {
+      min-height: 2.2rem;
+      padding: 0.5rem 0.7rem;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 650;
+    }
+
+    .remove-task:hover {
+      border-color: #e7c8c1;
+      background: #fbefec;
+    }
+
+    .add-task {
+      margin-top: 0.85rem;
+      border-style: dashed;
+      color: var(--accent);
+    }
+
+    .empty-stage {
+      margin: 0;
+      padding-block: 0.7rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .footer-note {
+      padding-block: 1.35rem 2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .footer-note p {
+      margin: 0;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        width: min(calc(100% - 2rem), var(--content-width));
+      }
+
+      .intro {
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 1.7rem;
+        padding-block: 3.2rem 2.2rem;
+      }
+
+      .progress-panel {
+        max-width: 480px;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        gap: 1.8rem;
+        padding-top: 1.35rem;
+      }
+
+      .stage-nav {
+        position: static;
+        padding: 0 0 1.1rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .stage-nav-list {
+        display: flex;
+        overflow-x: auto;
+        gap: 0.35rem;
+        padding-bottom: 0.2rem;
+        scrollbar-width: thin;
+      }
+
+      .stage-nav-list li {
+        flex: 0 0 auto;
+      }
+
+      .stage-nav a {
+        grid-template-columns: auto auto;
+        align-items: center;
+        gap: 0.35rem;
+        min-height: 2.5rem;
+        padding-inline: 0.65rem;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        white-space: nowrap;
+      }
+
+      .stage-nav-title {
+        margin-bottom: 0.55rem;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page-shell {
+        width: min(calc(100% - 1.4rem), var(--content-width));
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: 3.9rem;
+        padding-block: 0.7rem;
+      }
+
+      .wordmark {
+        gap: 0.45rem;
+        font-size: 0.75rem;
+      }
+
+      .wordmark-mark {
+        width: 1.85rem;
+      }
+
+      .save-status {
+        max-width: 10rem;
+        font-size: 0.75rem;
+      }
+
+      .intro {
+        padding-top: 2.8rem;
+      }
+
+      h1 {
+        font-size: clamp(2.55rem, 14vw, 4rem);
+      }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar-actions {
+        justify-content: flex-start;
+      }
+
+      .task-item {
+        grid-template-columns: 1.15rem minmax(0, 1fr) auto;
+        gap: 0.6rem;
+      }
+
+      .task-label {
+        font-size: 0.88rem;
+      }
+
+      .remove-task {
+        padding-inline: 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      :root {
+        --paper: #fff;
+        --surface: #fff;
+        --ink: #111;
+        --muted: #444;
+        --line: #bbb;
+      }
+
+      body {
+        background: #fff;
+        font-size: 10pt;
+      }
+
+      .page-shell {
+        width: 100%;
+      }
+
+      .topbar,
+      .toolbar,
+      .stage-nav,
+      .progress-panel,
+      .editor-only,
+      .remove-task,
+      .add-task,
+      .footer-note {
+        display: none !important;
+      }
+
+      .intro {
+        display: block;
+        padding: 0 0 1rem;
+      }
+
+      h1 {
+        max-width: none;
+        font-size: 26pt;
+      }
+
+      .workspace {
+        display: block;
+        padding: 0;
+      }
+
+      .stage,
+      .stage + .stage {
+        padding-block: 0.7rem;
+        break-inside: avoid;
+      }
+
+      .task-item {
+        padding-block: 0.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o checklist</a>
+
+  <div class="page-shell" id="inicio">
+    <header class="topbar">
+      <a class="wordmark" href="#inicio" aria-label="Checklist da homepage, início">
+        <span class="wordmark-mark" aria-hidden="true">EC</span>
+        <span>Roteiro de implementação</span>
+      </a>
+      <p class="save-status" id="saveStatus" role="status" aria-live="polite" data-state="ready">Salvamento local ativo</p>
+    </header>
+
+    <main id="conteudo">
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <h1 id="page-title">Construir a homepage</h1>
+          <p class="intro-copy">Roteiro de implementação em HTML e CSS para a homepage do e-commerce de calçados. Marque o que concluiu, ajuste os textos para o seu fluxo e acompanhe o avanço por etapa.</p>
+        </div>
+
+        <div class="progress-panel" aria-label="Progresso geral">
+          <div class="progress-panel-top">
+            <p class="progress-label">Progresso total</p>
+            <strong class="progress-value" id="progressPercent">0%</strong>
+          </div>
+          <progress id="overallProgress" value="0" max="100" aria-label="Progresso do checklist">0%</progress>
+          <p class="progress-count" id="progressCount" aria-live="polite">0 de 76 tarefas concluídas</p>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="Ações do checklist">
+        <p class="toolbar-note" id="editHint">O progresso e as alterações ficam salvos neste navegador.</p>
+        <div class="toolbar-actions">
+          <button class="button" id="resetProgress" type="button">Desmarcar tudo</button>
+          <button class="button" id="restoreOriginal" type="button">Restaurar checklist original</button>
+          <button class="button button-primary" id="toggleEdit" type="button" aria-pressed="false">Editar tarefas</button>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <aside class="stage-nav" aria-label="Navegação do checklist">
+          <p class="stage-nav-title">Etapas</p>
+          <nav aria-label="Ir para etapa">
+            <ol class="stage-nav-list">
+              <li><a href="#arquivos"><span class="nav-number">01</span><span>Preparar arquivos</span></a></li>
+              <li><a href="#html"><span class="nav-number">02</span><span>Documento HTML</span></a></li>
+              <li><a href="#estilos"><span class="nav-number">03</span><span>Estilos base</span></a></li>
+              <li><a href="#header"><span class="nav-number">04</span><span>Header</span></a></li>
+              <li><a href="#painel"><span class="nav-number">05</span><span>Painel comercial</span></a></li>
+              <li><a href="#hero"><span class="nav-number">06</span><span>Hero</span></a></li>
+              <li><a href="#produtos"><span class="nav-number">07</span><span>Produtos</span></a></li>
+              <li><a href="#footer"><span class="nav-number">08</span><span>Footer</span></a></li>
+              <li><a href="#revisao"><span class="nav-number">09</span><span>Responsividade e acessibilidade</span></a></li>
+              <li><a href="#final"><span class="nav-number">10</span><span>Revisão final</span></a></li>
+            </ol>
+          </nav>
+        </aside>
+
+        <div class="stages" id="stages">
+          <section class="stage" id="arquivos" data-stage-id="arquivos" aria-labelledby="title-arquivos">
+            <div class="stage-heading">
+              <div><h2 id="title-arquivos">Preparar os arquivos</h2></div>
+              <span class="stage-count" data-stage-count>0/7</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="01-01"><input class="task-checkbox" type="checkbox" id="task-01-01"><label class="task-label" for="task-01-01"><span class="task-copy">Confirmar a pasta raiz do projeto.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="01-02"><input class="task-checkbox" type="checkbox" id="task-01-02"><label class="task-label" for="task-01-02"><span class="task-copy">Manter index.html na raiz.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="01-03"><input class="task-checkbox" type="checkbox" id="task-01-03"><label class="task-label" for="task-01-03"><span class="task-copy">Criar styles.css na raiz.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="01-04"><input class="task-checkbox" type="checkbox" id="task-01-04"><label class="task-label" for="task-01-04"><span class="task-copy">Criar assets/images/hero/ para imagens do destaque.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="01-05"><input class="task-checkbox" type="checkbox" id="task-01-05"><label class="task-label" for="task-01-05"><span class="task-copy">Criar assets/images/products/ para imagens dos produtos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="01-06"><input class="task-checkbox" type="checkbox" id="task-01-06"><label class="task-label" for="task-01-06"><span class="task-copy">Criar assets/icons/ se usar arquivos de ícone separados.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="01-07"><input class="task-checkbox" type="checkbox" id="task-01-07"><label class="task-label" for="task-01-07"><span class="task-copy">Nomear as imagens com nomes curtos e descritivos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="html" data-stage-id="html" aria-labelledby="title-html">
+            <div class="stage-heading">
+              <div><h2 id="title-html">Montar o documento HTML</h2></div>
+              <span class="stage-count" data-stage-count>0/9</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="02-01"><input class="task-checkbox" type="checkbox" id="task-02-01"><label class="task-label" for="task-02-01"><span class="task-copy">Configurar o documento como HTML5 e definir o idioma como português do Brasil.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-02"><input class="task-checkbox" type="checkbox" id="task-02-02"><label class="task-label" for="task-02-02"><span class="task-copy">Adicionar charset, viewport, título e descrição da página.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-03"><input class="task-checkbox" type="checkbox" id="task-02-03"><label class="task-label" for="task-02-03"><span class="task-copy">Conectar styles.css ao HTML.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-04"><input class="task-checkbox" type="checkbox" id="task-02-04"><label class="task-label" for="task-02-04"><span class="task-copy">Organizar o documento com header, main e footer.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-05"><input class="task-checkbox" type="checkbox" id="task-02-05"><label class="task-label" for="task-02-05"><span class="task-copy">Adicionar um link para pular diretamente ao conteúdo principal.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-06"><input class="task-checkbox" type="checkbox" id="task-02-06"><label class="task-label" for="task-02-06"><span class="task-copy">Criar os elementos e seções na ordem em que aparecem na página.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-07"><input class="task-checkbox" type="checkbox" id="task-02-07"><label class="task-label" for="task-02-07"><span class="task-copy">Definir um h1 para o conteúdo principal e títulos para cada seção.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-08"><input class="task-checkbox" type="checkbox" id="task-02-08"><label class="task-label" for="task-02-08"><span class="task-copy">Criar IDs para as seções que receberão links de navegação.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="02-09"><input class="task-checkbox" type="checkbox" id="task-02-09"><label class="task-label" for="task-02-09"><span class="task-copy">Conferir que os links apontam para destinos definidos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="estilos" data-stage-id="estilos" aria-labelledby="title-estilos">
+            <div class="stage-heading">
+              <div><h2 id="title-estilos">Criar os estilos base</h2></div>
+              <span class="stage-count" data-stage-count>0/8</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="03-01"><input class="task-checkbox" type="checkbox" id="task-03-01"><label class="task-label" for="task-03-01"><span class="task-copy">Organizar styles.css em blocos de tokens, base, layout, componentes e responsividade.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="03-02"><input class="task-checkbox" type="checkbox" id="task-03-02"><label class="task-label" for="task-03-02"><span class="task-copy">Definir variáveis CSS para cores, espaçamento, tipografia e largura de conteúdo.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="03-03"><input class="task-checkbox" type="checkbox" id="task-03-03"><label class="task-label" for="task-03-03"><span class="task-copy">Aplicar box-sizing de forma consistente.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="03-04"><input class="task-checkbox" type="checkbox" id="task-03-04"><label class="task-label" for="task-03-04"><span class="task-copy">Definir fonte, tamanho e altura de linha padrão.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="03-05"><input class="task-checkbox" type="checkbox" id="task-03-05"><label class="task-label" for="task-03-05"><span class="task-copy">Definir estilos base para links, imagens e títulos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="03-06"><input class="task-checkbox" type="checkbox" id="task-03-06"><label class="task-label" for="task-03-06"><span class="task-copy">Criar uma classe reutilizável para limitar a largura do conteúdo.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="03-07"><input class="task-checkbox" type="checkbox" id="task-03-07"><label class="task-label" for="task-03-07"><span class="task-copy">Criar estilos visíveis para foco de teclado.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="03-08"><input class="task-checkbox" type="checkbox" id="task-03-08"><label class="task-label" for="task-03-08"><span class="task-copy">Verificar o resultado em uma tela estreita antes de continuar.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="header" data-stage-id="header" aria-labelledby="title-header">
+            <div class="stage-heading">
+              <div><h2 id="title-header">Implementar o header</h2></div>
+              <span class="stage-count" data-stage-count>0/6</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="04-01"><input class="task-checkbox" type="checkbox" id="task-04-01"><label class="task-label" for="task-04-01"><span class="task-copy">Adicionar o logotipo ou nome da loja.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="04-02"><input class="task-checkbox" type="checkbox" id="task-04-02"><label class="task-label" for="task-04-02"><span class="task-copy">Criar a navegação principal com rótulo acessível.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="04-03"><input class="task-checkbox" type="checkbox" id="task-04-03"><label class="task-label" for="task-04-03"><span class="task-copy">Adicionar os links de categorias com destinos definidos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="04-04"><input class="task-checkbox" type="checkbox" id="task-04-04"><label class="task-label" for="task-04-04"><span class="task-copy">Adicionar acesso à conta e ao carrinho apenas quando houver destino válido.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="04-05"><input class="task-checkbox" type="checkbox" id="task-04-05"><label class="task-label" for="task-04-05"><span class="task-copy">Estilizar alinhamento, espaçamento e estados de interação.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="04-06"><input class="task-checkbox" type="checkbox" id="task-04-06"><label class="task-label" for="task-04-06"><span class="task-copy">Conferir que os links ficam visíveis e utilizáveis em telas estreitas.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="painel" data-stage-id="painel" aria-labelledby="title-painel">
+            <div class="stage-heading">
+              <div><h2 id="title-painel">Implementar o painel comercial</h2></div>
+              <span class="stage-count" data-stage-count>0/5</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="05-01"><input class="task-checkbox" type="checkbox" id="task-05-01"><label class="task-label" for="task-05-01"><span class="task-copy">Criar uma seção para os benefícios comerciais.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="05-02"><input class="task-checkbox" type="checkbox" id="task-05-02"><label class="task-label" for="task-05-02"><span class="task-copy">Organizar os benefícios como uma lista.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="05-03"><input class="task-checkbox" type="checkbox" id="task-05-03"><label class="task-label" for="task-05-03"><span class="task-copy">Adicionar ícones decorativos, se necessário.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="05-04"><input class="task-checkbox" type="checkbox" id="task-05-04"><label class="task-label" for="task-05-04"><span class="task-copy">Manter o texto compreensível sem depender dos ícones ou das cores.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="05-05"><input class="task-checkbox" type="checkbox" id="task-05-05"><label class="task-label" for="task-05-05"><span class="task-copy">Ajustar a lista para telas estreitas sem cortar ou comprimir o texto.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="hero" data-stage-id="hero" aria-labelledby="title-hero">
+            <div class="stage-heading">
+              <div><h2 id="title-hero">Implementar o hero</h2></div>
+              <span class="stage-count" data-stage-count>0/7</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="06-01"><input class="task-checkbox" type="checkbox" id="task-06-01"><label class="task-label" for="task-06-01"><span class="task-copy">Adicionar título, texto complementar e CTA.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="06-02"><input class="task-checkbox" type="checkbox" id="task-06-02"><label class="task-label" for="task-06-02"><span class="task-copy">Salvar a imagem do hero em assets/images/hero/.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="06-03"><input class="task-checkbox" type="checkbox" id="task-06-03"><label class="task-label" for="task-06-03"><span class="task-copy">Inserir a imagem com texto alternativo adequado.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="06-04"><input class="task-checkbox" type="checkbox" id="task-06-04"><label class="task-label" for="task-06-04"><span class="task-copy">Ajustar a proporção e o recorte da imagem.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="06-05"><input class="task-checkbox" type="checkbox" id="task-06-05"><label class="task-label" for="task-06-05"><span class="task-copy">Definir o destino real do CTA.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="06-06"><input class="task-checkbox" type="checkbox" id="task-06-06"><label class="task-label" for="task-06-06"><span class="task-copy">Estilizar o hero para celular e desktop.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="06-07"><input class="task-checkbox" type="checkbox" id="task-06-07"><label class="task-label" for="task-06-07"><span class="task-copy">Conferir a legibilidade do texto sobre o fundo ou a imagem.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="produtos" data-stage-id="produtos" aria-labelledby="title-produtos">
+            <div class="stage-heading">
+              <div><h2 id="title-produtos">Implementar a grade de produtos</h2></div>
+              <span class="stage-count" data-stage-count>0/10</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="07-01"><input class="task-checkbox" type="checkbox" id="task-07-01"><label class="task-label" for="task-07-01"><span class="task-copy">Criar a seção de produtos com título próprio.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-02"><input class="task-checkbox" type="checkbox" id="task-07-02"><label class="task-label" for="task-07-02"><span class="task-copy">Organizar os cards como uma lista de produtos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-03"><input class="task-checkbox" type="checkbox" id="task-07-03"><label class="task-label" for="task-07-03"><span class="task-copy">Criar um card HTML e repetir a estrutura para os demais produtos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-04"><input class="task-checkbox" type="checkbox" id="task-07-04"><label class="task-label" for="task-07-04"><span class="task-copy">Salvar as imagens em assets/images/products/.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-05"><input class="task-checkbox" type="checkbox" id="task-07-05"><label class="task-label" for="task-07-05"><span class="task-copy">Adicionar texto alternativo e dimensões adequadas às imagens.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-06"><input class="task-checkbox" type="checkbox" id="task-07-06"><label class="task-label" for="task-07-06"><span class="task-copy">Incluir nome e preço de cada produto.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-07"><input class="task-checkbox" type="checkbox" id="task-07-07"><label class="task-label" for="task-07-07"><span class="task-copy">Marcar preço anterior e promocional quando aplicável.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-08"><input class="task-checkbox" type="checkbox" id="task-07-08"><label class="task-label" for="task-07-08"><span class="task-copy">Adicionar selos sem depender apenas da cor.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-09"><input class="task-checkbox" type="checkbox" id="task-07-09"><label class="task-label" for="task-07-09"><span class="task-copy">Criar o layout da grade com CSS Grid.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="07-10"><input class="task-checkbox" type="checkbox" id="task-07-10"><label class="task-label" for="task-07-10"><span class="task-copy">Conferir a reorganização dos cards em telas estreitas.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="footer" data-stage-id="footer" aria-labelledby="title-footer">
+            <div class="stage-heading">
+              <div><h2 id="title-footer">Implementar o footer</h2></div>
+              <span class="stage-count" data-stage-count>0/10</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="08-01"><input class="task-checkbox" type="checkbox" id="task-08-01"><label class="task-label" for="task-08-01"><span class="task-copy">Criar grupos de links institucionais e de ajuda.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-02"><input class="task-checkbox" type="checkbox" id="task-08-02"><label class="task-label" for="task-08-02"><span class="task-copy">Identificar cada grupo com um título.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-03"><input class="task-checkbox" type="checkbox" id="task-08-03"><label class="task-label" for="task-08-03"><span class="task-copy">Adicionar links de privacidade e termos com destinos definidos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-04"><input class="task-checkbox" type="checkbox" id="task-08-04"><label class="task-label" for="task-08-04"><span class="task-copy">Adicionar redes sociais com nomes acessíveis.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-05"><input class="task-checkbox" type="checkbox" id="task-08-05"><label class="task-label" for="task-08-05"><span class="task-copy">Adicionar formas de pagamento confirmadas.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-06"><input class="task-checkbox" type="checkbox" id="task-08-06"><label class="task-label" for="task-08-06"><span class="task-copy">Ajustar os grupos para telas estreitas.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-07"><input class="task-checkbox" type="checkbox" id="task-08-07"><label class="task-label" for="task-08-07"><span class="task-copy">Criar a apresentação visual da newsletter.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-08"><input class="task-checkbox" type="checkbox" id="task-08-08"><label class="task-label" for="task-08-08"><span class="task-copy">Identificar o campo de e-mail com um rótulo.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-09"><input class="task-checkbox" type="checkbox" id="task-08-09"><label class="task-label" for="task-08-09"><span class="task-copy">Sinalizar que o cadastro ainda não está ativo.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="08-10"><input class="task-checkbox" type="checkbox" id="task-08-10"><label class="task-label" for="task-08-10"><span class="task-copy">Evitar um botão de envio sem destino de envio configurado.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="revisao" data-stage-id="revisao" aria-labelledby="title-revisao">
+            <div class="stage-heading">
+              <div><h2 id="title-revisao">Revisar responsividade e acessibilidade</h2></div>
+              <span class="stage-count" data-stage-count>0/8</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="09-01"><input class="task-checkbox" type="checkbox" id="task-09-01"><label class="task-label" for="task-09-01"><span class="task-copy">Conferir header, painel, hero, produtos e footer em tela estreita.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="09-02"><input class="task-checkbox" type="checkbox" id="task-09-02"><label class="task-label" for="task-09-02"><span class="task-copy">Adicionar media queries conforme o conteúdo precisar de mais espaço.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="09-03"><input class="task-checkbox" type="checkbox" id="task-09-03"><label class="task-label" for="task-09-03"><span class="task-copy">Verificar o layout em celular, tablet e desktop.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="09-04"><input class="task-checkbox" type="checkbox" id="task-09-04"><label class="task-label" for="task-09-04"><span class="task-copy">Conferir se há rolagem horizontal ou elementos sobrepostos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="09-05"><input class="task-checkbox" type="checkbox" id="task-09-05"><label class="task-label" for="task-09-05"><span class="task-copy">Percorrer a página usando apenas o teclado.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="09-06"><input class="task-checkbox" type="checkbox" id="task-09-06"><label class="task-label" for="task-09-06"><span class="task-copy">Confirmar que foco e ordem de navegação estão visíveis e fazem sentido.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="09-07"><input class="task-checkbox" type="checkbox" id="task-09-07"><label class="task-label" for="task-09-07"><span class="task-copy">Conferir contraste de textos, links, preços e botões.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="09-08"><input class="task-checkbox" type="checkbox" id="task-09-08"><label class="task-label" for="task-09-08"><span class="task-copy">Confirmar que nenhuma interação depende apenas de hover.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+
+          <section class="stage" id="final" data-stage-id="final" aria-labelledby="title-final">
+            <div class="stage-heading">
+              <div><h2 id="title-final">Fazer a revisão final</h2></div>
+              <span class="stage-count" data-stage-count>0/6</span>
+            </div>
+            <ol class="task-list">
+              <li class="task-item" data-task-id="10-01"><input class="task-checkbox" type="checkbox" id="task-10-01"><label class="task-label" for="task-10-01"><span class="task-copy">Conferir se todas as imagens carregam e mantêm suas proporções.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="10-02"><input class="task-checkbox" type="checkbox" id="task-10-02"><label class="task-label" for="task-10-02"><span class="task-copy">Conferir se todos os links têm destinos válidos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="10-03"><input class="task-checkbox" type="checkbox" id="task-10-03"><label class="task-label" for="task-10-03"><span class="task-copy">Conferir se textos e preços estão corretos.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="10-04"><input class="task-checkbox" type="checkbox" id="task-10-04"><label class="task-label" for="task-10-04"><span class="task-copy">Remover estilos repetidos ou que não estejam sendo usados.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="10-05"><input class="task-checkbox" type="checkbox" id="task-10-05"><label class="task-label" for="task-10-05"><span class="task-copy">Confirmar que a página funciona sem JavaScript.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+              <li class="task-item" data-task-id="10-06"><input class="task-checkbox" type="checkbox" id="task-10-06"><label class="task-label" for="task-10-06"><span class="task-copy">Confirmar que não foram adicionados frameworks, bibliotecas ou ferramentas de build.</span></label><button class="remove-task" type="button" hidden>Remover</button></li>
+            </ol>
+            <p class="empty-stage" hidden>Nenhuma tarefa nesta etapa.</p>
+            <button class="button button-small add-task editor-only" type="button" hidden>+ Adicionar tarefa</button>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer-note">
+      <p>O checklist é independente da homepage. As alterações ficam armazenadas apenas neste navegador.</p>
+    </footer>
+  </div>
+
+  <noscript><p class="page-shell">Ative JavaScript no navegador para salvar o progresso e editar tarefas. A lista continua visível para consulta.</p></noscript>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "ecommerce-homepage-checklist-v1";
+      const stagesRoot = document.getElementById("stages");
+      const saveStatus = document.getElementById("saveStatus");
+      const progressCount = document.getElementById("progressCount");
+      const progressPercent = document.getElementById("progressPercent");
+      const overallProgress = document.getElementById("overallProgress");
+      const toggleEdit = document.getElementById("toggleEdit");
+      const editHint = document.getElementById("editHint");
+      let editing = false;
+      let saveTimer;
+      let storageAvailable = true;
+
+      function readPageState() {
+        return [...stagesRoot.querySelectorAll(".stage")].map((stage) => ({
+          id: stage.dataset.stageId,
+          tasks: [...stage.querySelectorAll(".task-item")].map((item) => ({
+            id: item.dataset.taskId,
+            text: item.querySelector(".task-copy").textContent.trim(),
+            checked: item.querySelector(".task-checkbox").checked
+          }))
+        }));
+      }
+
+      const originalState = readPageState().map((stage) => ({
+        id: stage.id,
+        tasks: stage.tasks.map((task) => ({ ...task, checked: false }))
+      }));
+
+      function makeTaskRow(stageId, task) {
+        const item = document.createElement("li");
+        item.className = "task-item";
+        item.dataset.taskId = task.id || `${stageId}-${Date.now()}`;
+
+        const checkbox = document.createElement("input");
+        checkbox.className = "task-checkbox";
+        checkbox.type = "checkbox";
+        checkbox.id = `task-${item.dataset.taskId}`;
+        checkbox.checked = Boolean(task.checked);
+
+        const label = document.createElement("label");
+        label.className = "task-label";
+        label.htmlFor = editing ? "" : checkbox.id;
+
+        const copy = document.createElement("span");
+        copy.className = "task-copy";
+        copy.textContent = task.text || "Nova tarefa";
+        copy.contentEditable = String(editing);
+        copy.spellcheck = false;
+        copy.setAttribute("aria-label", "Texto da tarefa");
+        if (editing) checkbox.setAttribute("aria-label", copy.textContent);
+
+        const remove = document.createElement("button");
+        remove.className = "remove-task";
+        remove.type = "button";
+        remove.textContent = "Remover";
+        remove.hidden = !editing;
+        remove.setAttribute("aria-label", `Remover tarefa: ${copy.textContent}`);
+
+        label.append(copy);
+        item.append(checkbox, label, remove);
+        return item;
+      }
+
+      function applySavedState(savedStages) {
+        const byId = new Map(savedStages.map((stage) => [stage.id, stage]));
+        stagesRoot.querySelectorAll(".stage").forEach((stage) => {
+          const saved = byId.get(stage.dataset.stageId);
+          if (!saved || !Array.isArray(saved.tasks)) return;
+          const list = stage.querySelector(".task-list");
+          list.replaceChildren(...saved.tasks.map((task) => makeTaskRow(stage.dataset.stageId, task)));
+        });
+      }
+
+      function setSaveStatus(message, state = "ready") {
+        saveStatus.textContent = message;
+        saveStatus.dataset.state = state;
+      }
+
+      function updateProgress() {
+        let total = 0;
+        let complete = 0;
+
+        stagesRoot.querySelectorAll(".stage").forEach((stage) => {
+          const tasks = [...stage.querySelectorAll(".task-item")];
+          const finished = tasks.filter((item) => item.querySelector(".task-checkbox").checked).length;
+          const count = stage.querySelector("[data-stage-count]");
+          const emptyMessage = stage.querySelector(".empty-stage");
+          count.textContent = `${finished}/${tasks.length}`;
+          emptyMessage.hidden = tasks.length > 0;
+          total += tasks.length;
+          complete += finished;
+          tasks.forEach((item) => item.classList.toggle("is-complete", item.querySelector(".task-checkbox").checked));
+        });
+
+        const percent = total ? Math.round((complete / total) * 100) : 0;
+        progressPercent.textContent = `${percent}%`;
+        progressCount.textContent = `${complete} de ${total} tarefas concluídas`;
+        overallProgress.value = percent;
+        overallProgress.setAttribute("aria-valuetext", `${percent}% concluído`);
+      }
+
+      function saveState() {
+        if (!storageAvailable) return;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, stages: readPageState() }));
+          setSaveStatus("Salvo neste navegador", "saved");
+        } catch {
+          storageAvailable = false;
+          setSaveStatus("Não foi possível salvar neste navegador", "error");
+          editHint.textContent = "O armazenamento local está bloqueado. As alterações valem enquanto esta página estiver aberta.";
+        }
+      }
+
+      function scheduleSave() {
+        if (!storageAvailable) return;
+        window.clearTimeout(saveTimer);
+        setSaveStatus("Salvando alterações…", "pending");
+        saveTimer = window.setTimeout(saveState, 220);
+      }
+
+      function setEditingMode(active) {
+        editing = active;
+        toggleEdit.setAttribute("aria-pressed", String(active));
+        toggleEdit.textContent = active ? "Concluir edição" : "Editar tarefas";
+        editHint.textContent = active
+          ? "Clique no texto para editar. Você também pode adicionar ou remover tarefas."
+          : "O progresso e as alterações ficam salvos neste navegador.";
+
+        stagesRoot.querySelectorAll(".stage").forEach((stage) => {
+          stage.querySelectorAll(".task-item").forEach((item) => {
+            const copy = item.querySelector(".task-copy");
+            const checkbox = item.querySelector(".task-checkbox");
+            const label = item.querySelector(".task-label");
+            copy.contentEditable = String(active);
+            copy.setAttribute("aria-label", active ? "Edite o texto da tarefa" : "Texto da tarefa");
+            label.htmlFor = active ? "" : checkbox.id;
+            if (active) checkbox.setAttribute("aria-label", copy.textContent);
+            else checkbox.removeAttribute("aria-label");
+          });
+          stage.querySelectorAll(".remove-task").forEach((button) => {
+            button.hidden = !active;
+          });
+          stage.querySelector(".add-task").hidden = !active;
+        });
+      }
+
+      function loadSavedState() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (!saved) return;
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.version === 1 && Array.isArray(parsed.stages)) {
+            applySavedState(parsed.stages);
+            setSaveStatus("Progresso recuperado", "saved");
+          }
+        } catch {
+          storageAvailable = false;
+          setSaveStatus("Armazenamento local indisponível", "error");
+          editHint.textContent = "Não foi possível acessar o armazenamento local. As alterações ficam nesta sessão.";
+        }
+      }
+
+      toggleEdit.addEventListener("click", () => {
+        setEditingMode(!editing);
+        if (!editing) scheduleSave();
+      });
+
+      document.getElementById("resetProgress").addEventListener("click", () => {
+        if (!window.confirm("Desmarcar todas as tarefas concluídas?")) return;
+        stagesRoot.querySelectorAll(".task-checkbox").forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+        updateProgress();
+        scheduleSave();
+      });
+
+      document.getElementById("restoreOriginal").addEventListener("click", () => {
+        if (!window.confirm("Restaurar a lista original? Isso apaga as edições, tarefas adicionadas e marcações salvas.")) return;
+        applySavedState(originalState);
+        setEditingMode(false);
+        updateProgress();
+        scheduleSave();
+      });
+
+      stagesRoot.addEventListener("change", (event) => {
+        if (!event.target.matches(".task-checkbox")) return;
+        updateProgress();
+        scheduleSave();
+      });
+
+      stagesRoot.addEventListener("input", (event) => {
+        if (!event.target.matches(".task-copy[contenteditable='true']")) return;
+        const item = event.target.closest(".task-item");
+        item.querySelector(".remove-task").setAttribute("aria-label", `Remover tarefa: ${event.target.textContent.trim()}`);
+        item.querySelector(".task-checkbox").setAttribute("aria-label", event.target.textContent.trim());
+        scheduleSave();
+      });
+
+      stagesRoot.addEventListener("keydown", (event) => {
+        if (!event.target.matches(".task-copy[contenteditable='true']")) return;
+        if (event.key === "Enter") {
+          event.preventDefault();
+          event.target.blur();
+        }
+      });
+
+      stagesRoot.addEventListener("focusout", (event) => {
+        if (!event.target.matches(".task-copy[contenteditable='true']")) return;
+        const cleanText = event.target.textContent.replace(/\s+/g, " ").trim();
+        if (!cleanText) event.target.textContent = "Nova tarefa";
+        event.target.closest(".task-item").querySelector(".remove-task").setAttribute("aria-label", `Remover tarefa: ${event.target.textContent.trim()}`);
+        scheduleSave();
+      });
+
+      stagesRoot.addEventListener("click", (event) => {
+        const addButton = event.target.closest(".add-task");
+        if (addButton) {
+          const stage = addButton.closest(".stage");
+          const list = stage.querySelector(".task-list");
+          const id = `${stage.dataset.stageId}-nova-${Date.now()}`;
+          const item = makeTaskRow(stage.dataset.stageId, { id, text: "Nova tarefa", checked: false });
+          list.append(item);
+          updateProgress();
+          scheduleSave();
+          item.querySelector(".task-copy").focus();
+          return;
+        }
+
+        const removeButton = event.target.closest(".remove-task");
+        if (!removeButton) return;
+        const item = removeButton.closest(".task-item");
+        const label = item.querySelector(".task-copy").textContent.trim();
+        if (!window.confirm(`Remover esta tarefa?\n\n${label}`)) return;
+        item.remove();
+        updateProgress();
+        scheduleSave();
+      });
+
+      loadSavedState();
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>
