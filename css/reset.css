@@ -1,0 +1,96 @@
+/*
+ * Baseado em “A (more) Modern CSS Reset”, de Andy Bell (Piccalilli, 2023).
+ * Fonte: https://piccalil.li/blog/a-more-modern-css-reset/
+ * Licença da fonte: Creative Commons Attribution (CC BY).
+ */
+
+/* Usa border-box para os elementos e pseudo-elementos. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Evita o aumento automático do tamanho da fonte em dispositivos móveis. */
+html {
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+/* Remove apenas a margem final, deixando o espaçamento macro para o projeto. */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin-block-end: 0;
+}
+
+/* Remove marcadores apenas de listas identificadas como listas visuais. */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+
+/* Define padrões básicos para o corpo do documento. */
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Usa uma altura de linha mais curta em títulos e controles. */
+h1,
+h2,
+h3,
+h4,
+button,
+input,
+label {
+  line-height: 1.1;
+}
+
+/* Equilibra a quebra de linhas dos títulos. */
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+
+/* Ajusta links sem classe. */
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+  color: currentColor;
+}
+
+/* Mantém imagens responsivas e em bloco. */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* Faz controles de formulário herdarem a tipografia do documento. */
+input,
+button,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Evita áreas de texto muito baixas quando rows não foi definido. */
+textarea:not([rows]) {
+  min-height: 10em;
+}
+
+/* Acrescenta espaço antes de elementos acessados por âncora. */
+:target {
+  scroll-margin-block: 5ex;
+}
