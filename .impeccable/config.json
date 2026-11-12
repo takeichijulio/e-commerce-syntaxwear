@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-12T18:45:55.011Z",
+        "reason": "user confirmed HTML-only skeleton with empty stylesheet; browser default heading sizes apply and custom typography is outside scope"
+      }
+    ]
+  }
+}
